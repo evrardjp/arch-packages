@@ -12,14 +12,14 @@ cat pkglist
 echo "=> Checking for invalid package names"
 # Do not allow "/" in package names
 # That could prevent mistakes of deleting /
-cat pkglist | grep -e '/' && (echo "^ invalid names" && exit 1)
+cat pkglist | grep -v -e '^$' -e '^#' |  grep -e '/' && (echo "^ invalid names" && exit 1)
 
 echo "=> Current repo packages"
 repoctl list > $TMPFILE
 cat ${TMPFILE}
 
 echo "=> Downloading new packages"
-NEWPKGS=$(cat pkglist | grep -v -f ${TMPFILE})
+NEWPKGS=$(cat pkglist | grep -v -e '^$' -e '^#' | grep -v -f ${TMPFILE})
 for pkg in ${NEWPKGS}; do
 	repoctl --debug down -r ${pkg}
 	echo "- ${pkg} downloaded"
