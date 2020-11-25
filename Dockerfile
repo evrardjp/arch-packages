@@ -13,7 +13,6 @@ COPY --from=repoctl /root/go/bin/repoctl /usr/bin/repoctl
 COPY config.toml /home/builder/.config/repoctl/config.toml
 
 WORKDIR /home/builder/arch-repo-builder
-COPY pkglist .
 COPY repo-builder.sh .
 COPY repo.sh .
 ENTRYPOINT ["./repo.sh"]
