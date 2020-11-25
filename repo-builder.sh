@@ -4,10 +4,7 @@ set -o errexit
 
 trap 'rm -f "$TMPFILE"' EXIT
 TMPFILE=$(mktemp) || exit 1
-
-export REPOCTL_CONFIG=${REPOCTL_CONFIG:-$(pwd)/config.toml}
 DELETE_FAILED_PKGS="${DELETE_FAILED_PKGS:-yes}"
-echo "loading repoctl config from $REPOCTL_CONFIG"
 
 echo "=> Desired packages"
 cat pkglist
@@ -24,7 +21,7 @@ cat ${TMPFILE}
 echo "=> Downloading new packages"
 NEWPKGS=$(cat pkglist | grep -v -f ${TMPFILE})
 for pkg in ${NEWPKGS}; do
-	repoctl down -r ${pkg}
+	repoctl --debug down -r ${pkg}
 	echo "- ${pkg} downloaded"
 done
 
@@ -41,9 +38,12 @@ failed_pkgs=()
 built_pkgs=()
 for pkg in $(cat pkglist); do
 	if [[ -d $pkg ]]; then
-		echo "Building ${pkg}"
+		echo "====================== Building ${pkg}"
 		cd "$pkg"
-			makepkg -cs && \
+		        echo "PKGBUILD:"
+			cat PKGBUILD
+		        echo "Build starting..."
+			makepkg -cs --noconfirm --noprogressbar && \
 			repoctl add *.pkg.tar.zst && \
 			built_pkgs+=("$pkg") || failed_pkgs+=("$pkg")
 		cd ..
