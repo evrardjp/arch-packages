@@ -1,3 +1,4 @@
 synology-drive
 teams
+# vscode bin necessary for ssh support. Else please simply use the "code" package.
 visual-studio-code-bin
